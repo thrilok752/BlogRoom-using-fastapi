@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}
+Post
+{% endblock %}
+
+{% block content %}
+
+<div class="content-section">
+
+    <form id="postForm">
+
+        <fieldset class="form-group">
+
+            <legend class="border-bottom mb-4">
+                Post
+            </legend>
+
+            <div id="div_id_title" class="form-group">
+
+                <label for="id_title" class="requiredField">
+                    Title<span class="asteriskField">*</span>
+                </label>
+
+                <div>
+                    <input
+                        type="text"
+                        name="title"
+                        class="textinput form-control"
+                        required
+                        id="id_title"
+                        value="{{ post.title if post else '' }}">
+                </div>
+
+                <div id="title-error" class="text-danger"></div>
+
+            </div>
+
+
+            <div id="div_id_content" class="form-group">
+
+                <label for="id_content" class="requiredField">
+                    Content<span class="asteriskField">*</span>
+                </label>
+
+                <div>
+                    <textarea
+                        name="content"
+                        class="textarea form-control"
+                        required
+                        id="id_content">{{ post.content if post else '' }}</textarea>
+                </div>
+
+                <div id="content-error" class="text-danger"></div>
+
+            </div>
+
+        </fieldset>
+
+
+        <div class="form-group mt-3">
+
+            <button class="btn btn-outline-info"
+                    type="submit">
+
+                {% if not post %}
+                    Publish
+                {% else %}
+                    Update
+                {% endif %}
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script type="module">
+
+import { getToken } from "/static/js/auth.js";
+
+
+const postid = {{ post.id if post else 'null' }};
+
+const form = document.getElementById("postForm");
+
+
+form.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+
+    const formdata = new FormData(form);
+
+    const postData = Object.fromEntries(
+        formdata.entries()
+    );
+
+
+    let url = "/api/posts";
+    let method = "POST";
+
+
+    if (postid !== null) {
+
+        url = `/api/posts/${postid}`;
+        method = "PATCH";
+
+    }
+
+
+    const token = getToken();
+
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+
+    const response = await fetch(url, {
+
+        method: method,
+
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+
+        body: JSON.stringify(postData)
+
+    });
+
+
+    if (response.ok) {
+
+        window.location.href = "/";
+
+    } else {
+
+        const error = await response.json();
+
+        for (const err of error.detail) {
+
+            const field = err.loc[1];
+            const message = err.msg;
+
+            document.getElementById(
+                `${field}-error`
+            ).textContent = message;
+
+        }
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

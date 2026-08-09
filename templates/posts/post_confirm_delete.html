@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}
+Delete Post
+{% endblock %}
+
+{% block content %}
+
+<div class="content-section">
+
+    <form method="POST">
+        <fieldset class="form-group">
+
+            <legend class="border-bottom mb-4">
+
+                Delete Post
+
+            </legend>
+
+            <h4>
+                Are you sure you want to delete
+                "{{ post_data.title }}" ?
+            </h4>
+
+        </fieldset>
+
+        <div class="mt-4">
+
+            <button id="confirm_delete" class="btn btn-danger"
+                    type="button">
+
+                Yes, Delete
+
+            </button>
+
+            <a class="btn btn-secondary"
+               href="{{ url_for('postdetails',post_id=post_data.id) }}">
+
+                Cancel
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+
+<script type="module">
+
+import { getToken } from "/static/js/auth.js";
+
+const postId = {{ post_data.id }};
+
+document
+    .getElementById("confirm_delete")
+    .addEventListener("click", async () => {
+
+        const token = getToken();
+
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
+        const response = await fetch(
+            `/api/posts/${postId}`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.ok) {
+
+            window.location.href = "/";
+
+        } else {
+
+            const error = await response.json();
+            console.log(error);
+
+        }
+
+    });
+
+</script>
+
+{% endblock %}

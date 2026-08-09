@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ postdetail.title }}
+{% endblock %}
+
+{% block content %}
+
+<article class="content-section">
+
+    <div class="d-flex">
+
+        {# <img class="article-img"
+             src="{{ postdetail.author.profile.image.url }}"> #}
+        
+        <img class="article-img"
+             src="{{ postdetail.author.image_path }}" alt="img">
+             
+
+        <div class="w-100">
+
+            <div class="article-metadata d-flex justify-content-between">
+
+                <div>
+
+                    <a class="text-decoration-none"
+                       href="#">
+                        {{ postdetail.author.username }}
+                    </a>
+
+                    <small class="text-muted">
+                        • {{ postdetail.date_posted.strftime("%B %d,%Y")}}
+                    </small>
+
+                </div>
+
+                <div id="ownerActions" class="d-none">
+
+                    <a class="btn btn-secondary btn-sm"
+                    href="{{ url_for('EditForm', post_id=postdetail.id) }}">
+                        Update
+                    </a>
+
+                    <a class="btn btn-danger btn-sm"
+                    href="{{ url_for('DeleteConfirm', post_id=postdetail.id) }}">
+                        Delete
+                    </a>
+
+                </div>
+
+
+            </div>
+
+            <h2 class="mb-3">
+                {{ postdetail.title }}
+            </h2>
+
+            <p class="article-content">
+                {{ postdetail.content }}
+            </p>
+
+        </div>
+
+    </div>
+
+</article>
+
+{% endblock %}
+{% block script %}
+
+<script type="module">
+
+import { getCurrentUser } from "/static/js/auth.js";
+
+const postAuthorId = {{ postdetail.author_id }};
+const ownerActions = document.getElementById("ownerActions");
+
+async function checkPostOwner() {
+
+    const currentUser = await getCurrentUser();
+
+    if (
+        currentUser &&
+        currentUser.id === postAuthorId
+    ) {
+        ownerActions.classList.remove("d-none");
+    }
+
+}
+
+checkPostOwner();
+
+</script>
+
+{% endblock %}

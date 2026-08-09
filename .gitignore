@@ -1,0 +1,25 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Virtual environments
+.venv/
+
+# Environment variables / secrets
+.env
+
+# Editor files
+.vscode/
+
+# Local uploaded files
+media/
+
+# Personal/reference notes
+snippets(sync).txt
+
+# Temporary S3 testing script
+check_s3.py

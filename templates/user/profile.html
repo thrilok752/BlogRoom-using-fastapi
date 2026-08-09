@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+
+{% block title %}
+Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="content-section">
+
+    <div class="media d-flex align-items-center">
+
+        <img class="account-img"
+             id="profileImage"
+             src="">
+
+        <div class="media-body ms-4">
+
+            <h2 class="account-heading"
+                id="profileUsername">
+            </h2>
+
+            <p class="text-muted"
+               id="profileEmail">
+            </p>
+
+            <a class="btn btn-outline-secondary" href="{{url_for('PasswordChange')}}">
+                Change Password
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <form id="profileForm"
+          method="POST"
+          enctype="multipart/form-data">
+
+        <fieldset class="form-group">
+
+            <legend class="border-bottom mb-4">
+                Profile Info
+            </legend>
+
+
+            <div id="div_id_username" class="form-group">
+
+                <label for="id_username"
+                       class="requiredField">
+
+                    Username<span class="asteriskField">*</span>
+
+                </label>
+
+                <div>
+
+                    <input type="text"
+                           name="username"
+                           maxlength="150"
+                           class="textinput form-control"
+                           required
+                           id="id_username">
+
+                    <small class="form-text text-muted">
+                        Required. 150 characters or fewer.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div id="div_id_email" class="form-group">
+
+                <label for="id_email">
+                    Email address
+                </label>
+
+                <div>
+
+                    <input type="email"
+                           name="email"
+                           maxlength="320"
+                           class="emailinput form-control"
+                           id="id_email">
+
+                </div>
+
+            </div>
+
+
+            <div id="div_id_image" class="form-group">
+
+                <label for="id_image"
+                       class="requiredField">
+
+                    Image<span class="asteriskField">*</span>
+
+                </label>
+
+                <div>
+
+                    <div id="currentImageContainer">
+                        Currently:
+                        <a id="currentImage"
+                           href="#"
+                           target="_blank">
+                        </a>
+                        <br>
+                    </div>
+
+                    Change:
+
+                    <input type="file"
+                           name="image"
+                           accept="image/*"
+                           class="clearablefileinput form-control-file"
+                           id="id_image">
+                    
+                    <button type="button"
+                        class="btn btn-outline-danger mt-2"
+                        id="deleteImageBtn">
+
+                        Remove Profile Picture
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </fieldset>
+
+
+        <div id="profileError"
+             class="text-danger mb-3 d-none">
+        </div>
+
+
+        <div class="form-group mt-3">
+
+            <button class="btn btn-outline-info"
+                    type="submit">
+
+                Update
+
+            </button>
+
+        </div>
+        <div class="border-top pt-3 mt-4">
+
+            <button
+                type="button"
+                class="btn btn-outline-danger"
+                id="deleteAccountBtn">
+
+                Delete Account
+
+            </button>
+
+       </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+{% block script %}
+
+<script type="module">
+
+import { getCurrentUser, getToken } from "/static/js/auth.js";
+
+const profileForm = document.getElementById("profileForm");
+
+const usernameInput = document.getElementById("id_username");
+const emailInput = document.getElementById("id_email");
+const imageInput = document.getElementById("id_image");
+
+
+const profileUsername = document.getElementById("profileUsername");
+const profileEmail = document.getElementById("profileEmail");
+const profileImage = document.getElementById("profileImage");
+
+const currentImage = document.getElementById("currentImage");
+
+const profileError = document.getElementById("profileError");
+const deleteAccountBtn = document.getElementById("deleteAccountBtn");
+const deleteImageBtn = document.getElementById("deleteImageBtn");
+
+
+
+let currentUser = null;
+
+
+/* Load logged-in user's profile */
+
+async function loadProfile() {
+
+    currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+        window.location.href = "/login";
+        return;
+    }
+
+
+    profileUsername.textContent = currentUser.username;
+    profileEmail.textContent = currentUser.email;
+
+    usernameInput.value = currentUser.username;
+    emailInput.value = currentUser.email;
+
+
+    if (currentUser.image_path) {
+
+        profileImage.src = currentUser.image_path;
+
+        currentImage.href = currentUser.image_path;
+        currentImage.textContent =
+            currentUser.image_file || currentUser.image_path;
+
+    }
+    deleteImageBtn.classList.toggle(
+    "d-none",
+    !currentUser.image_file
+);
+
+}
+
+
+/* Update profile */
+
+profileForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    profileError.classList.add("d-none");
+
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const token = getToken();
+
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+
+    const userData = {
+        username: usernameInput.value,
+        email: emailInput.value
+    };
+
+
+    try {
+
+        const response = await fetch(
+            `/api/users/${currentUser.id}`,
+            {
+                method: "PATCH",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify(userData)
+            }
+        );
+
+
+        if (response.ok) {
+
+    let updatedUser = await response.json();
+
+    profileUsername.textContent = updatedUser.username;
+    profileEmail.textContent = updatedUser.email;
+
+    usernameInput.value = updatedUser.username;
+    emailInput.value = updatedUser.email;
+
+
+    // Update profile image only when a new image is selected
+    if (imageInput.files.length > 0) {
+
+        const imageData = new FormData();
+
+        imageData.append("image", imageInput.files[0]);
+
+        const imageResponse = await fetch(
+            `/api/users/${currentUser.id}/profile_image`,
+            {
+                method: "PATCH",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: imageData
+            }
+        );
+
+
+        if (!imageResponse.ok) {
+
+            const error = await imageResponse.json();
+
+            profileError.textContent = error.detail;
+            profileError.classList.remove("d-none");
+
+            return;
+        }
+
+
+        updatedUser = await imageResponse.json();
+
+        profileImage.src = updatedUser.image_path;
+
+        currentImage.href = updatedUser.image_path;
+        currentImage.textContent =
+            updatedUser.image_file || updatedUser.image_path;
+
+        imageInput.value = "";
+    }
+
+
+    currentUser = updatedUser;
+    deleteImageBtn.classList.toggle(
+    "d-none",
+    !currentUser.image_file
+);
+} else {
+
+            const error = await response.json();
+
+            profileError.textContent = error.detail;
+            profileError.classList.remove("d-none");
+
+        }
+
+    } catch (error) {
+
+        profileError.textContent =
+            "Network error. Please try again.";
+
+        profileError.classList.remove("d-none");
+
+    }
+
+});
+
+deleteImageBtn.addEventListener("click", async () => {
+
+    if (!currentUser) {
+        return;
+    }
+
+    if (!currentUser.image_file) {
+        profileError.textContent =
+            "No profile picture to remove.";
+
+        profileError.classList.remove("d-none");
+        return;
+    }
+
+    const confirmed = confirm(
+        "Are you sure you want to remove your profile picture?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const token = getToken();
+
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+    profileError.classList.add("d-none");
+
+    try {
+
+        const response = await fetch(
+            `/api/users/${currentUser.id}/profile_image`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.ok) {
+
+            const updatedUser = await response.json();
+
+            currentUser = updatedUser;
+
+            profileImage.src = updatedUser.image_path;
+
+            currentImage.href = updatedUser.image_path;
+            currentImage.textContent =
+                updatedUser.image_file || updatedUser.image_path;
+            
+            deleteImageBtn.classList.add("d-none");
+
+        } else {
+
+            const error = await response.json();
+
+            profileError.textContent = error.detail;
+            profileError.classList.remove("d-none");
+
+        }
+
+    } catch (error) {
+
+        profileError.textContent =
+            "Network error. Please try again.";
+
+        profileError.classList.remove("d-none");
+
+    }
+
+});
+
+deleteAccountBtn.addEventListener("click", async () => {
+
+    if (!currentUser) {
+        return;
+    }
+
+    const confirmed = confirm(
+        "Are you sure you want to delete your account?"
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const token = getToken();
+
+    if (!token) {
+        window.location.href = "/login";
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/api/users/${currentUser.id}`,
+            {
+                method: "DELETE",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        if (response.ok) {
+
+            localStorage.removeItem("access_token");
+
+            window.location.href = "/";
+
+        } else {
+
+            const error = await response.json();
+
+            profileError.textContent = error.detail;
+            profileError.classList.remove("d-none");
+
+        }
+
+    } catch (error) {
+
+        profileError.textContent =
+            "Network error. Please try again.";
+
+        profileError.classList.remove("d-none");
+
+    }
+
+});
+
+loadProfile();
+
+
+</script>
+
+{% endblock %}

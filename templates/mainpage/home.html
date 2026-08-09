@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+{% for post in posts %}
+
+<article class="content-section">
+
+    <div class="d-flex">
+
+        {# <img class="article-img"
+             src="{{ post.author.profile.image.url }}"> #}
+        <img class="article-img"
+             src="{{ post.author.image_path }}" alt="img">
+
+        <div class="w-100">
+
+            <div class="article-metadata">
+
+                <small class="text-muted">
+                    {# <a href="{% url 'UserPosts' post.author %}">{{ post.author }}</a> #}
+                    <a href="{{ url_for('userposts',user_id=post.author_id) }}">{{ post.author.username }}</a>
+                    •
+                    {{ post.date_posted.strftime("%B %d,%Y") }}
+                </small>
+
+            </div>
+
+            <h2>
+                {# <a class="article-title"
+                   href="{% url 'Postdeep' post.id %}">
+                    {{ post.title }}
+                </a> #}
+                <a class="article-title"
+                   href="{{ url_for('postdetails',post_id=post.id) }}">
+                    {{ post.title }}
+                   </a>
+            </h2>
+
+            <p class="article-content">
+                {{ post.content[:40] }}
+            </p>
+
+        </div>
+
+    </div>
+
+</article>
+
+{% endfor %}
+{% include "utils/paginator.html" %}
+{% endblock %}

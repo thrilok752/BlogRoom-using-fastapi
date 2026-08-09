@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Posts by {{ username }}
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Posts by {{username}}({{total}})
+</h2>
+
+{% for post in posts %}
+
+<article class="content-section">
+
+    <div class="d-flex">
+
+        <img class="article-img"
+             src="{{ post.author.image_path }}" alt="img">
+
+        <div class="w-100">
+
+            <div class="article-metadata">
+
+                <small class="text-muted">
+
+               {{ post.date_posted.strftime("%B %d,%Y") }}
+
+                </small>
+
+            </div>
+
+            <h2>
+
+                <a class="article-title"
+                   href="{{url_for('postdetails',post_id=post.id)}}">
+
+                    {{ post.title }}
+
+                </a>
+
+            </h2>
+
+            <p class="article-content">
+
+                {{ post.content[:40] }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+</article>
+
+{% endfor %}
+{% include "utils/paginator.html" %}
+{% endblock %}
