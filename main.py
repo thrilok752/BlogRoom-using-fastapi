@@ -9,7 +9,7 @@ from starlette.exceptions import HTTPException as starlette_httpexception
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import engine,Base,get_db
-from sqlalchemy import select,func
+from sqlalchemy import select,func,text
 import models
 import math
 from routers import posts,users
