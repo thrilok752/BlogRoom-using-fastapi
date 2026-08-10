@@ -33,6 +33,18 @@ app.include_router(users.route,prefix="/api/users",tags=["users"])
 app.include_router(posts.route,prefix="/api/posts",tags=["posts"])
 
 
+@app.get("/health")
+async def health_check(db: Annotated[AsyncSession, Depends(get_db)]):
+    try:
+        await db.execute(text("SELECT 1"))
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database unavailable",
+        ) from exc
+    return {"status": "healthy"}
+
+
 @app.get("/login",include_in_schema=False,name="Login")
 async def login(requests:Request):
     return templates.TemplateResponse(requests,"auth/login.html")
