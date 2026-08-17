@@ -29,11 +29,15 @@ jobs:
       - name: Build Docker image
         run: docker build -t fastapi-app:latest .
 
+      - name: Copy local .env
+        run: |
+          Copy-Item "D:\upskill\fastapi\blogger\.env" ".env"
+
       - name: Start container
         shell: powershell
         run: |
           docker rm -f fastapi-app 2>$null
-          docker run -d --name fastapi-app -p 8080:8080 fastapi-app:latest
+          docker run -d --name fastapi-app --env-file .env -p 8080:8080 fastapi-app:latest
 
       - name: Wait for application
         shell: powershell
