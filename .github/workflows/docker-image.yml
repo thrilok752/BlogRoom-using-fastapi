@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: python -m uv sync --locked
       
-      # - name: Lint
-      #   run: python -m uv run ruff check .
+      - name: Lint
+        run: python -m uv run ruff check .
       
       - name: Run tests
         run: python -m uv run pytest
