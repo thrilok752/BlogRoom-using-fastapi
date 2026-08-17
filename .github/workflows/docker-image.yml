@@ -16,7 +16,7 @@ jobs:
         run: python --version
 
       - name: Verify uv
-        run: uv --version
+        run: python -m uv --version
 
       - name: Install dependencies
         run: uv sync --locked
