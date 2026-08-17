@@ -17,12 +17,12 @@ os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
 os.environ["AWS_DEFAULT_REGION"] = "us-east-1"
 
 
+import asyncio
+
 import boto3
 import pytest
-import asyncio
 from httpx import ASGITransport, AsyncClient
 from moto import mock_aws
-
 
 if os.name == "nt":
     asyncio.set_event_loop_policy(

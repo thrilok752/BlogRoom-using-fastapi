@@ -1,24 +1,46 @@
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
-from datetime import timedelta,datetime,UTC
-from fastapi import HTTPException,status,Depends,APIRouter,UploadFile,File,Form,Query
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from fastapi.security import OAuth2PasswordRequestForm
-from schema import (
-    postresponse,UserPublic,UserPrivate,
-    UserCreate,UserUpdate,Token,PaginationPostResponse,
-    ForgotPasswordRequest,ResetPasswordRequest,ChangePasswordRequest)
-from sqlalchemy.orm import selectinload
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db
-from sqlalchemy import select,func,delete
-from auth import (
-    create_access_token,hash_password,
-    verify_passoword,current_user,hash_reset_token,generate_reset_token)
-from PIL import UnidentifiedImageError
-from starlette.concurrency import run_in_threadpool
-from config import settings
-from image_utils import delete_profile_image,process_profile_image,save_image
+from sqlalchemy.orm import selectinload
+
 import models
-from email_utils import send_email,send_password_reset_email
+from auth import (
+    create_access_token,
+    current_user,
+    generate_reset_token,
+    hash_password,
+    hash_reset_token,
+    verify_passoword,
+)
+from config import settings
+from database import get_db
+from email_utils import send_password_reset_email
+from image_utils import delete_profile_image, save_image
+from schema import (
+    ChangePasswordRequest,
+    ForgotPasswordRequest,
+    PaginationPostResponse,
+    ResetPasswordRequest,
+    Token,
+    UserCreate,
+    UserPrivate,
+    UserPublic,
+    UserUpdate,
+    postresponse,
+)
 
 route=APIRouter()
 

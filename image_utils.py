@@ -1,13 +1,14 @@
 import uuid
-import boto3
 from io import BytesIO
-from pathlib import Path
-from PIL import Image,ImageOps
-from fastapi import UploadFile,HTTPException,status
-from config import settings
-from starlette.concurrency import run_in_threadpool
-from PIL import UnidentifiedImageError
+
+import boto3
 from botocore.exceptions import ClientError
+from fastapi import HTTPException, UploadFile, status
+from PIL import Image, ImageOps, UnidentifiedImageError
+from starlette.concurrency import run_in_threadpool
+
+from config import settings
+
 # PROFILE_PICS_DIR =Path("media/profile_pics")
 
 
