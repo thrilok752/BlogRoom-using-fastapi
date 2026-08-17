@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    # This automatically injects all 15 variables instantly!
+    env_file:
+      - .env
+    volumes:
+      - .:/app          # Mounts your local Windows code for live updates
+      - /app/.venv      # MAGIC TRICK: Prevents Windows from overwriting your installed packages

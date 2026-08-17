@@ -22,4 +22,5 @@ dependencies = [
 dev = [
     "moto[s3]>=5.2.2",
     "pytest>=9.1.1",
+    "ruff>=0.16.3",
 ]
