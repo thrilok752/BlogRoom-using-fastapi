@@ -30,17 +30,17 @@ jobs:
         run: docker build -t fastapi-app:latest .
 
       - name: Start container
-        shell: pwsh
+        shell: powershell
         run: |
           docker rm -f fastapi-app 2>$null
           docker run -d --name fastapi-app -p 8080:8080 fastapi-app:latest
 
       - name: Wait for application
-        shell: pwsh
+        shell: powershell
         run: Start-Sleep -Seconds 5
 
       - name: Health check
-        shell: pwsh
+        shell: powershell
         run: |
           $response = Invoke-WebRequest http://localhost:8080/health
           if ($response.StatusCode -ne 200) {
