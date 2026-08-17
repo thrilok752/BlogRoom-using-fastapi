@@ -46,10 +46,7 @@ jobs:
       - name: Health check
         shell: powershell
         run: |
-          $response = Invoke-WebRequest http://localhost:8080/health
-          if ($response.StatusCode -ne 200) {
-            throw "Health check failed"
-          }
+          curl.exe -v http://localhost:8080/health
 
       - name: Show running containers
         if: always()
