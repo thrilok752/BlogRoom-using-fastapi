@@ -12,10 +12,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: astral-sh/setup-uv@v5
+      - name: Verify Python
+        run: python --version
 
-      - name: Install Python
-        run: uv python install 3.14
+      - name: Verify uv
+        run: uv --version
 
       - name: Install dependencies
         run: uv sync --locked
