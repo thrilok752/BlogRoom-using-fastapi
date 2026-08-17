@@ -12,21 +12,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verify Python
+      - name: Check Python
         run: python --version
-
-      - name: Verify uv
+      
+      - name: Check uv
         run: python -m uv --version
-
+      
       - name: Install dependencies
-        run: uv sync --locked
-
+        run: python -m uv sync --locked
+      
       - name: Lint
-        run: uv run ruff check .
-
+        run: python -m uv run ruff check .
+      
       - name: Run tests
-        run: uv run pytest
-
+        run: python -m uv run pytest
       - name: Build Docker image
         run: docker build -t fastapi-app:latest .
 
