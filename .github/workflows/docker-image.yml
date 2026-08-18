@@ -6,7 +6,8 @@ on:
   pull_request:
 
 jobs:
-  ci:
+  lint:
+    name: Lint
     runs-on: self-hosted
 
     steps:
@@ -14,43 +15,78 @@ jobs:
 
       - name: Check Python
         run: python --version
-      
+
       - name: Check uv
         run: python -m uv --version
-      
+
       - name: Install dependencies
         run: python -m uv sync --locked
-      
-      - name: Lint
+
+      - name: Ruff
         run: python -m uv run ruff check .
-      
+
+  test:
+    name: Unit Tests
+    runs-on: self-hosted
+    needs: lint
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: python -m uv sync --locked
+
       - name: Run tests
         run: python -m uv run pytest
+
+  build:
+    name: Docker Build
+    runs-on: self-hosted
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
       - name: Build Docker image
         run: docker build -t fastapi-app:latest .
+
+      - name: Show Docker images
+        run: docker images
+
+  integration:
+    name: Integration Test
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Copy local .env
         run: |
           Copy-Item "D:\upskill\fastapi\blogger\.env" ".env"
 
-      - name: Start container
+      - name: Remove old container
         shell: powershell
         run: |
           docker rm -f fastapi-app 2>$null
+
+      - name: Start container
+        run: |
           docker run -d --name fastapi-app --env-file .env -p 8080:8080 fastapi-app:latest
 
       - name: Wait for application
-        shell: powershell
         run: Start-Sleep -Seconds 20
 
       - name: Health check
-        shell: powershell
-        run: |
-          curl.exe -v http://localhost:8080/health
+        run: curl.exe --fail http://localhost:8080/health
 
       - name: Show running containers
         if: always()
         run: docker ps -a
+
+      - name: Show container logs
+        if: always()
+        run: docker logs fastapi-app
 
       - name: Cleanup
         if: always()
