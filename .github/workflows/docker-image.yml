@@ -53,7 +53,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t $env:IMAGE_NAME:$env:IMAGE_TAG .
+        run: docker build -t ${env:IMAGE_NAME}:$env:IMAGE_TAG .
 
       - name: Show Docker images
         run: docker images
@@ -81,7 +81,7 @@ jobs:
           --name $env:IMAGE_NAME `
           --env-file .env `
           -p $env:APP_PORT`:8080 `
-          $env:IMAGE_NAME:$env:IMAGE_TAG
+          ${env:IMAGE_NAME}:$env:IMAGE_TAG
 
       - name: Wait for application
         run: Start-Sleep -Seconds 8
