@@ -61,6 +61,12 @@ pipeline{
             }
         }
 
+        stage("Wait") {
+            steps {
+                sleep(time: 8, unit: "SECONDS")
+            }
+        }
+
         stage("Health"){
             steps {
                 bat "curl.exe http://localhost:8081/health"
