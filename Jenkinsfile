@@ -47,10 +47,14 @@ pipeline{
 
         stage("Run Container"){
             steps {
+                bat """
+                copy D:\\upskill\\fastapi\\blogger\\.env .env
+                """
                 bat "${docker} rm -f fastapi-japp"
                 bat """
                 ${docker} run -d ^
-                ---name fastapi-japp ^
+                --name fastapi-japp ^
+                --env-file .env ^
                 -p 8081:8080 ^
                 fastapi-japp:latest
                 """
