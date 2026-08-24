@@ -1,5 +1,7 @@
 
 def python = 'C:\\Users\\chota\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe'
+def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\${docker}.exe'
+
 
 pipeline{
     agent any
@@ -14,7 +16,7 @@ pipeline{
             steps{
                 bat "${python} --version"
                 bat "${python} -m uv --version"
-                bat "docker --version"
+                bat "${docker} --version"
             }
 
         }
@@ -39,15 +41,15 @@ pipeline{
 
         stage("Docker Build"){
             steps{
-                bat "docker build -t fastapi-japp:latest ."
+                bat "${docker} build -t fastapi-japp:latest ."
             }
         }
 
         stage("Run Container"){
             steps {
-                bat "docker rm -f fastapi-japp"
+                bat "${docker} rm -f fastapi-japp"
                 bat """
-                docker run -d ^
+                ${docker} run -d ^
                 ---name fastapi-japp ^
                 -p 8081:8080 ^
                 fastapi-japp:latest
@@ -63,8 +65,8 @@ pipeline{
     }
     post{
         always{
-            bat "docker logs fastapi-japp"
-            bat "docker rm -f fastapi-japp"
+            bat "${docker} logs fastapi-japp"
+            bat "${docker} rm -f fastapi-japp"
         }
         success{
             echo "========pipeline executed successfully ========"
