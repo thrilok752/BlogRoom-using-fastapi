@@ -1,3 +1,6 @@
+
+def python = 'C:\Users\chota\AppData\Local\Python\pythoncore-3.14-64\python.exe'
+
 pipeline{
     agent any
     stages {
@@ -9,8 +12,8 @@ pipeline{
 
         stage("Verify Environment"){
             steps{
-                bat "python --version"
-                bat "python -m uv --version"
+                bat "${python} --version"
+                bat "${python} -m uv --version"
                 bat "docker --version"
             }
 
@@ -18,19 +21,19 @@ pipeline{
 
         stage("install dependencies"){
             steps{
-                bat "python -m uv sync --locked"
+                bat "${python} -m uv sync --locked"
             }
         }
 
         stage("Lint"){
             steps{
-                bat "python -m uv run ruff check ."
+                bat "${python} -m uv run ruff check ."
             }
         }
 
         stage("Testing/Unit Test"){
             steps{
-                bat "python -m uv run pytest"
+                bat "${python} -m uv run pytest"
             }
         }
 
