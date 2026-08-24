@@ -1,6 +1,6 @@
 
 def python = 'C:\\Users\\chota\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe'
-def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\${docker}.exe'
+def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
 
 
 pipeline{
