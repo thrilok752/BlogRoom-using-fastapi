@@ -1,5 +1,5 @@
 
-def python = 'C:\Users\chota\AppData\Local\Python\pythoncore-3.14-64\python.exe'
+def python = 'C:\\Users\\chota\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe'
 
 pipeline{
     agent any
