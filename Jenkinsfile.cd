@@ -53,6 +53,12 @@ pipeline {
             }
         }
 
+        stage("Wait") {
+            steps {
+                sleep(time: 8, unit: "SECONDS")
+            }
+        }
+
         stage("Health Check") {
             steps {
                 bat "curl.exe --fail http://localhost:8081/health"
