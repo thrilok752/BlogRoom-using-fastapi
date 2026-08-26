@@ -23,7 +23,9 @@ pipeline {
                     echo %DOCKER_PASS%|${docker} login -u %DOCKER_USER% --password-stdin
                     """
                     bat """${docker} pull %DOCKER_USER%/fastapi-japp:${params.image_tag}"""
-                    def image_name = %DOCKER_USER% 
+
+                    def image_name = env.DOCKER_USER
+
                     bat "${docker} logout"
                 }
             }
