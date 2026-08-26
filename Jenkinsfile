@@ -77,7 +77,7 @@ pipeline{
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: "dockerblog",
-                    usernameVariable: "DOCKER_USER"
+                    usernameVariable: "DOCKER_USER",
                     passwordVariable: "DOCKER_PASS"
                 )]) {
                     bat """
