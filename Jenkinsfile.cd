@@ -28,7 +28,9 @@ pipeline {
 
         stage("Pull Latest Image") {
             steps {
-                bat "${docker} pull thrilok17/fastapi-japp:${params.image_tag}"
+                bat "${docker} pull %DOCKER_USER%/fastapi-japp:${params.image_tag}"
+                bat "${docker} logout"
+
             }
         }
 
