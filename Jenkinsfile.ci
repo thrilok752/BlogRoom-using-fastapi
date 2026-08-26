@@ -107,7 +107,8 @@ pipeline{
         }
         success{
             echo "========build is successfull  ========"
-            build job: "jen run image"
+            build job: "jen run image",
+            parameters: [string(name: 'image_tag', value: params.image_tag)]
         }
         failure{
             echo "========pipeline execution failed========"
