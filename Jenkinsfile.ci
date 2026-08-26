@@ -47,7 +47,7 @@ pipeline{
 
         stage("Docker Build"){
             steps{
-                bat "${docker} build -t fastapi-japp:${params.image_tag} ."
+                bat "${docker} build -t fastapi-japp:latest ."
             }
         }
 
@@ -62,7 +62,7 @@ pipeline{
                 --name fastapi-japp ^
                 --env-file .env ^
                 -p 8081:8080 ^
-                fastapi-japp:${params.image_tag}
+                fastapi-japp:latest
                 """
             }
         }
@@ -90,7 +90,7 @@ pipeline{
                     echo %DOCKER_PASS%| ${docker} login -u %DOCKER_USER% --password-stdin
                     """
                     bat """
-                    ${docker} tag fastapi-japp:${params.image_tag} %DOCKER_USER%/fastapi-japp:${params.image_tag}
+                    ${docker} tag fastapi-japp:latest %DOCKER_USER%/fastapi-japp:${params.image_tag}
                     """
                     bat """
                     ${docker} tag fastapi-japp:latest %DOCKER_USER%/fastapi-japp:latest
@@ -101,6 +101,8 @@ pipeline{
                      bat """
                     ${docker} push %DOCKER_USER%/fastapi-japp:latest
                     """
+
+                    bat "${docker} logout"
                 }
             }
         
@@ -108,8 +110,9 @@ pipeline{
     }
     post{
         always{
-            bat "${docker} logs fastapi-japp"
-            bat "${docker} rm -f fastapi-japp"
+            bat "del .env"
+            bat "${docker} logs fastapi-japp || exit /b 0"
+            bat "${docker} rm -f fastapi-japp || exit /b 0"
         }
         success{
             echo "========build is successfull  ========"
