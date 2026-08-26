@@ -24,7 +24,7 @@ pipeline {
                     """
                     bat """${docker} pull %DOCKER_USER%/fastapi-japp:${params.image_tag}"""
 
-                    def image_name = env.DOCKER_USER
+                    def image_name = ${env.DOCKER_USER}
 
                     bat "${docker} logout"
                 }
