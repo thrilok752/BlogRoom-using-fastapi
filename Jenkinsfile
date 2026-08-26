@@ -72,6 +72,26 @@ pipeline{
                 bat "curl.exe http://localhost:8081/health"
             }
         }
+
+        stage("Docker Hub"){
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: "dockerblog",
+                    usernameVariable: "DOCKER_USER"
+                    passwordVariable: "DOCKER_PASS"
+                )]) {
+                    bat """
+                    echo %DOCKER_PASS% | ${docker} login -u %DOCKER_USER% --password-stdin
+                    """
+                    bat """
+                    ${docker} tag fastapi-japp:latest %DOCKER_USER%/fastapi-japp:latest
+                    """
+                    bat """
+                    ${docker} push %DOCKER_USER%/fastapi-japp:latest
+                    """
+                }
+            }
+        }
     }
     post{
         always{
