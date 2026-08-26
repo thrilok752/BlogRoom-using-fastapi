@@ -4,6 +4,11 @@ def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resourc
 
 pipeline{
     agent any
+
+    environment {
+    IMAGE_REPO = "thrilok17/fastapi-japp"
+    }
+
     parameters{
         string(
             name:"image_tag",
@@ -90,16 +95,16 @@ pipeline{
                     echo %DOCKER_PASS%| ${docker} login -u %DOCKER_USER% --password-stdin
                     """
                     bat """
-                    ${docker} tag fastapi-japp:latest %DOCKER_USER%/fastapi-japp:${params.image_tag}
+                    ${docker} tag fastapi-japp:latest ${env.IMAGE_REPO}:${params.image_tag}
                     """
                     bat """
-                    ${docker} tag fastapi-japp:latest %DOCKER_USER%/fastapi-japp:latest
+                    ${docker} tag fastapi-japp:latest ${env.IMAGE_REPO}:latest
                     """
                     bat """
-                    ${docker} push %DOCKER_USER%/fastapi-japp:${params.image_tag}
+                    ${docker} push ${env.IMAGE_REPO}:${params.image_tag}
                     """
                      bat """
-                    ${docker} push %DOCKER_USER%/fastapi-japp:latest
+                    ${docker} push ${env.IMAGE_REPO}:latest
                     """
 
                     bat "${docker} logout"
