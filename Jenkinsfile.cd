@@ -1,0 +1,83 @@
+def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+
+pipeline {
+    agent any
+
+    stages {
+
+        stage("Docker Login") {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    bat """
+                    echo %DOCKER_PASS%|${docker} login -u %DOCKER_USER% --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage("Pull Latest Image") {
+            steps {
+                bat "${docker} pull thrilok17/fastapi-japp:latest"
+            }
+        }
+
+        stage("Stop Old Container") {
+            steps {
+                bat "${docker} stop fastapi-japp || exit /b 0"
+            }
+        }
+
+        stage("Remove Old Container") {
+            steps {
+                bat "${docker} rm fastapi-japp || exit /b 0"
+            }
+        }
+
+        stage("Run Container") {
+            steps {
+                bat """
+                copy D:\\upskill\\fastapi\\blogger\\.env .env
+                """
+                bat """
+                ${docker} run -d ^
+                --name fastapi-japp ^
+                --env-file .env ^
+                -p 8081:8080 ^
+                thrilok17/fastapi-japp:latest
+                """
+            }
+        }
+
+        stage("Health Check") {
+            steps {
+                bat "curl.exe --fail http://localhost:8081/health"
+            }
+        }
+
+        stage("Application URL") {
+            steps {
+                echo "======================================="
+                echo "Application Started Successfully"
+                echo ""
+                echo "Swagger : http://localhost:8081/docs"
+                echo "MainURL  : http://localhost:8081"
+                echo "======================================="
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Deployment Successful"
+        }
+
+        failure {
+            echo "Deployment Failed"
+        }
+    }
+}
