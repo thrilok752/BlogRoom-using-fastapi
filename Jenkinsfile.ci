@@ -93,7 +93,13 @@ pipeline{
                     ${docker} tag fastapi-japp:${params.image_tag} %DOCKER_USER%/fastapi-japp:${params.image_tag}
                     """
                     bat """
+                    ${docker} tag fastapi-japp:latest %DOCKER_USER%/fastapi-japp:latest
+                    """
+                    bat """
                     ${docker} push %DOCKER_USER%/fastapi-japp:${params.image_tag}
+                    """
+                     bat """
+                    ${docker} push %DOCKER_USER%/fastapi-japp:latest
                     """
                 }
             }
