@@ -2,7 +2,13 @@ def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resourc
 
 pipeline {
     agent any
-
+    parameters{
+        string(
+            name:"image_tag",
+            defaultValue:"latest",
+            description:"docker image tag"
+        )
+    }
     stages {
 
         stage("Docker Login") {
@@ -22,7 +28,7 @@ pipeline {
 
         stage("Pull Latest Image") {
             steps {
-                bat "${docker} pull thrilok17/fastapi-japp:latest"
+                bat "${docker} pull thrilok17/fastapi-japp:${params.image_tag}"
             }
         }
 
@@ -48,7 +54,7 @@ pipeline {
                 --name fastapi-japp ^
                 --env-file .env ^
                 -p 8081:8080 ^
-                thrilok17/fastapi-japp:latest
+                thrilok17/fastapi-japp:${params.image_tag}
                 """
             }
         }
