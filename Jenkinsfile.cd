@@ -11,7 +11,7 @@ pipeline {
     }
     stages {
 
-        stage("Docker Login") {
+        stage("Pull image from docker hub") {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerblog',
@@ -22,15 +22,10 @@ pipeline {
                     bat """
                     echo %DOCKER_PASS%|${docker} login -u %DOCKER_USER% --password-stdin
                     """
+                    bat """${docker} pull %DOCKER_USER%/fastapi-japp:${params.image_tag}"""
+                    def image_name = %DOCKER_USER% 
+                    bat "${docker} logout"
                 }
-            }
-        }
-
-        stage("Pull Latest Image") {
-            steps {
-                bat "${docker} pull %DOCKER_USER%/fastapi-japp:${params.image_tag}"
-                bat "${docker} logout"
-
             }
         }
 
@@ -56,7 +51,7 @@ pipeline {
                 --name fastapi-japp ^
                 --env-file .env ^
                 -p 8081:8080 ^
-                thrilok17/fastapi-japp:${params.image_tag}
+                ${image_name}/fastapi-japp:${params.image_tag}
                 """
             }
         }
