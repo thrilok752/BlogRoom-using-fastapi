@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-application
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-application
+  template:
+    metadata:
+      labels:
+        app: fastapi-application
+    spec:
+      containers:
+      - name: fastapi-application
+        image: thrilok17/fastapi-japp:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+
+        envFrom:
+        - secretRef:
+           name: application-env
+      
+      imagePullSecrets:
+      - name: dockerhub-secret
+
+      

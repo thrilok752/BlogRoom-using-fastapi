@@ -1,95 +1,101 @@
-def docker = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe'
+def kubectl = 'C:\\Users\\chota\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe'
 
 pipeline {
+
     agent any
+
     environment {
-    IMAGE_REPO = "thrilok17/fastapi-japp"
-}
-    parameters{
+        IMAGE_REPO = "thrilok17/fastapi-japp"
+        KUBECONFIG = "C:\\Users\\chota\\.kube\\config"
+    }
+
+    parameters {
         string(
-            name:"image_tag",
-            defaultValue:"latest",
-            description:"docker image tag"
+            name: "image_tag",
+            defaultValue: "latest",
+            description: "Docker image tag to deploy"
         )
     }
+
     stages {
 
-        stage("Pull image from docker hub") {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerblog',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-
-                    bat """
-                    echo %DOCKER_PASS%|${docker} login -u %DOCKER_USER% --password-stdin
-                    """
-                    bat """${docker} pull ${env.IMAGE_REPO}:${params.image_tag}"""
-
-                    bat "${docker} logout"
-                }
-            }
-        }
-
-        stage("Stop Old Container") {
-            steps {
-                bat "${docker} stop fastapi-japp || exit /b 0"
-            }
-        }
-
-        stage("Remove Old Container") {
-            steps {
-                bat "${docker} rm fastapi-japp || exit /b 0"
-            }
-        }
-
-        stage("Run Container") {
+        stage("Check Kubernetes") {
             steps {
                 bat """
-                copy D:\\upskill\\fastapi\\blogger\\.env .env
-                """
-                bat """
-                ${docker} run -d ^
-                --name fastapi-japp ^
-                --env-file .env ^
-                -p 8081:8080 ^
-                ${env.IMAGE_REPO}:${params.image_tag}
+                "${kubectl}" get nodes
                 """
             }
         }
 
-        stage("Wait") {
+        stage("Deploy FastAPI") {
             steps {
-                sleep(time: 8, unit: "SECONDS")
+                bat """
+                "${kubectl}" apply -f deployment.yaml
+                """
+            }
+        }
+
+        stage("Deploy Service") {
+            steps {
+                bat """
+                "${kubectl}" apply -f service.yaml
+                """
+            }
+        }
+
+        stage("Update Image") {
+            steps {
+                bat """
+                "${kubectl}" set image deployment/fastapi-application ^
+                fastapi-application=${env.IMAGE_REPO}:${params.image_tag}
+                """
+            }
+        }
+
+        stage("Wait for Deployment") {
+            steps {
+                bat """
+                "${kubectl}" rollout status deployment/fastapi-application --timeout=120s
+                """
+            }
+        }
+
+        stage("Check Pods") {
+            steps {
+                bat """
+                "${kubectl}" get pods
+                """
             }
         }
 
         stage("Health Check") {
             steps {
-                bat "curl.exe --fail http://localhost:8081/health"
+                bat """
+                curl.exe --fail http://api.blogroom.com/health
+                """
             }
         }
 
         stage("Application URL") {
             steps {
                 echo "======================================="
-                echo "Application Started Successfully"
+                echo "Kubernetes Deployment Successful"
                 echo ""
-                echo "Swagger : http://localhost:8081/docs"
-                echo "MainURL  : http://localhost:8081"
+                echo "Application : http://api.blogroom.com"
+                echo "Health      : http://api.blogroom.com/health"
                 echo "======================================="
             }
         }
     }
 
     post {
+
         success {
-            echo "Deployment Successful"
+            echo "Kubernetes CD Successful"
         }
 
         failure {
-            echo "Deployment Failed"
+            echo "Kubernetes CD Failed"
         }
     }
 }
