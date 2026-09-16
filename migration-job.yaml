@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fastapi-migration
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+
+      containers:
+        - name: migration
+          image: thrilok17/fastapi-japp:latest
+
+          command:
+            - alembic
+            - upgrade
+            - head
+
+          envFrom:
+            - secretRef:
+                name: application-env
+
+          imagePullPolicy: Always
+
+      imagePullSecrets:
+        - name: dockerhub-secret

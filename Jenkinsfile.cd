@@ -52,6 +52,18 @@ pipeline {
             }
         }
 
+        stage("Run Database Migration") {
+            steps {
+                bat """
+                "${kubectl}" delete job fastapi-migration --ignore-not-found
+                "${kubectl}" apply -f migration-job.yaml
+                "${kubectl}" set image job/fastapi-migration ^
+                 migration=${env.IMAGE_REPO}:${params.image_tag}
+                "${kubectl}" wait --for=condition=complete job/fastapi-migration --timeout=120s
+                """
+           }
+        }
+
         stage("Wait for Deployment") {
             steps {
                 bat """
