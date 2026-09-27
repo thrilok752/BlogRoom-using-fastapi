@@ -1,6 +1,6 @@
 # The BlogRoom
 
-The BlogRoom is a FastAPI-based blogging platform that allows users to create, manage, and share blog posts. It features secure user authentication, profile management, image uploads, password recovery via email, PostgreSQL database integration, automated testing, Docker containerization, CI/CD pipelines, and Kubernetes deployment.
+The BlogRoom is a FastAPI-based blogging platform that allows users to create, manage, and share blog posts. It features secure user authentication, profile management, image uploads, password recovery via email, Neon PostgreSQL database integration, automated testing, Docker containerization, CI/CD pipelines, and Kubernetes deployment.
 
 This project was built while learning FastAPI and further enhanced with database migrations, AWS S3 integration, Docker, CI/CD, and Kubernetes.
 
@@ -40,7 +40,7 @@ This project was built while learning FastAPI and further enhanced with database
 
 ### Database
 
-- PostgreSQL
+- Neon PostgreSQL
 - SQLAlchemy
 - Alembic Migrations
 
@@ -87,7 +87,7 @@ This project was built while learning FastAPI and further enhanced with database
 
 ### Database
 
-- PostgreSQL
+- Neon PostgreSQL
 - SQLAlchemy
 - Alembic
 
@@ -149,7 +149,7 @@ blogger/
 ├── pyproject.toml
 ├── alembic.ini
 └── README.md
-```
+````
 
 ---
 
@@ -178,10 +178,10 @@ uv sync
 
 Create a `.env` file in the project root and configure the required environment variables for:
 
-- Application
-- PostgreSQL
-- Amazon S3
-- Mailtrap
+* Application
+* Neon PostgreSQL
+* Amazon S3
+* Mailtrap
 
 ---
 
@@ -279,8 +279,8 @@ docker compose down
 
 The project includes CI/CD pipelines using:
 
-- GitHub Actions
-- Jenkins
+* GitHub Actions
+* Jenkins
 
 The CI pipeline performs code quality checks and tests.
 
@@ -292,12 +292,12 @@ The Jenkins CD pipeline builds and publishes the Docker image and deploys the ap
 
 The application is deployed to Kubernetes using:
 
-- Kubernetes Deployment
-- ClusterIP Service
-- NGINX Ingress
-- Kubernetes Secrets
-- Docker Registry Image Pull Secret
-- Alembic Migration Job
+* Kubernetes Deployment
+* ClusterIP Service
+* NGINX Ingress
+* Kubernetes Secrets
+* Docker Registry Image Pull Secret
+* Alembic Migration Job
 
 Database migrations are executed in Kubernetes before the application deployment is completed.
 
@@ -309,18 +309,19 @@ The application was containerized using Docker and deployed using Kubernetes.
 
 The deployment process includes:
 
-- Docker Image Build
-- Docker Image Publishing
-- Database Migration
-- Kubernetes Deployment
-- Kubernetes Service
-- NGINX Ingress
-- Application Health Check
+* Docker Image Build
+* Docker Image Publishing
+* Database Migration
+* Kubernetes Deployment
+* Kubernetes Service
+* NGINX Ingress
+* Application Health Check
 
 ---
 
 ## Acknowledgements
 
-This project was built while learning FastAPI and later extended with PostgreSQL, SQLAlchemy, Alembic, Amazon S3, Mailtrap, Docker, CI/CD pipelines, and Kubernetes deployment.
+This project was built while learning FastAPI and later extended with Neon PostgreSQL, SQLAlchemy, Alembic, Amazon S3, Mailtrap, Docker, CI/CD pipelines, and Kubernetes deployment.
 
+```
 ```
